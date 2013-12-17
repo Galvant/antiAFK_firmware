@@ -27,7 +27,7 @@
 #define DEBUG 1
 //#define KEYBOARD_ENABLE 1
 
-const byte EEPROM_CODE = 0x5C;
+const byte EEPROM_CODE = 0x5A;
 const byte FIRMWARE_VERSION = 1;
 const byte EEPROM_CODE_ADDRESS = 0x00;
 const byte EEPROM_VERSION_ADDRESS = EEPROM_CODE_ADDRESS + 1; // 0x01
@@ -38,8 +38,8 @@ const byte EEPROM_VALID_KEYS_ADDRESS = EEPROM_VALID_KEYS_LENGTH_ADDRESS + 1; // 
 
 #define buttonPin 4
 
-unsigned long period = 10; // Delay between keyboard events in seconds
-unsigned long variance = 5; // Maximum variance of period in seconds
+unsigned long period = 10*1000; // Delay between keyboard events in seconds
+unsigned long variance = 5*1000; // Maximum variance of period in seconds
 String valid_keys = "wasd ";
 int valid_keys_length = valid_keys.length();
 int nextKeyPress = period;
@@ -60,7 +60,7 @@ void setup() {
   pinMode(buttonPin, INPUT);
   randomSeed(analogRead(0));
   
-  Timer1.initialize(); // Starts timer with default 1sec interupt
+  Timer1.initialize(1000); // Starts timer with 1000us interupt
   Timer1.attachInterrupt(callback);
   
   //Check EEPROM for stored settings
@@ -105,15 +105,17 @@ void callback() {
   if (running == true) {
     counter++;
     #if defined(DEBUG)
-    Serial.print("Counter: ");
-    Serial.println(counter);
+    if (counter % 1000 == 0) {
+      Serial.print("Counter: ");
+      Serial.println(counter);
+    }
     #endif
     if (counter >= nextKeyPress) {
       // Press the key
       #if defined(DEBUG)
       Serial.print("Key press event after ");
       Serial.print(counter);
-      Serial.println(" seconds.");
+      Serial.println(" milliseconds.");
       Serial.print("Key pressed: ");
       Serial.println(valid_keys[random(valid_keys.length())]);
       #endif
@@ -167,7 +169,7 @@ void loop() {
     incomingCmd = readLine();
     if (incomingCmd.substring(0,7).equalsIgnoreCase("period:")) {
       period = incomingCmd.substring(7,incomingCmd.length()).toInt();
-      EEPROM_readAnything(EEPROM_PERIOD_ADDRESS, period);
+      EEPROM_writeAnything(EEPROM_PERIOD_ADDRESS, period);
       //EEPROM.write(EEPROM_PERIOD_ADDRESS, period);
       #if defined(DEBUG)
       Serial.print("Period set to: ");
