@@ -126,15 +126,22 @@ void callback() {
         variance = EEPROM.read(EEPROM_VARIANCE_ADDRESS);
       }
       // Generate next key press time
-      if (random(0,2) == 0){
-        nextKeyPress = period + random(0, variance + 1);
-      } else {
-        nextKeyPress = period - random(0, variance + 1);
-      }
-      // Reset seconds counter
-      counter = 0;
+      generateNextKeyPress();
     }
   }
+}
+
+void generateNextKeyPress() {
+  if (random(0,2) == 0){
+    nextKeyPress = period + random(0, variance + 1);
+  } else {
+    nextKeyPress = period - random(0, variance + 1);
+  }
+  #if defined(DEBUG)
+  Serial.print("Next key press set to: ");
+  Serial.println(nextKeyPress);
+  #endif
+  counter = 0;
 }
 
 void toggleRunningState() {
@@ -166,6 +173,7 @@ void loop() {
     if (incomingCmd.substring(0,7).equalsIgnoreCase("period:")) {
       period = incomingCmd.substring(7,incomingCmd.length()).toInt();
       EEPROM_writeAnything(EEPROM_PERIOD_ADDRESS, period);
+      generateNextKeyPress();
       #if defined(DEBUG)
       Serial.print("Period set to: ");
       Serial.println(period);
@@ -181,6 +189,7 @@ void loop() {
       }
       else {
         EEPROM_writeAnything(EEPROM_VARIANCE_ADDRESS, variance);
+        generateNextKeyPress();
       }
       #if defined(DEBUG)
       Serial.print("Variance set to: ");
