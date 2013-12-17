@@ -26,18 +26,18 @@
 //#define DEBUG 1
 #define KEYBOARD_ENABLE 1
 
-const byte EEPROM_CODE = 0x5A;
+const byte EEPROM_CODE = 0x5C;
 const byte EEPROM_CODE_ADDRESS = 0x00;
-const byte EEPROM_VERSION_ADDRESS = 0x01;
-const byte EEPROM_PERIOD_ADDRESS = 0x02;
-const byte EEPROM_VARIANCE_ADDRESS = 0x03;
-const byte EEPROM_VALID_KEYS_LENGTH_ADDRESS = 0x04;
-const byte EEPROM_VALID_KEYS_ADDRESS = 0x05;
+const byte EEPROM_VERSION_ADDRESS = EEPROM_CODE_ADDRESS + 1; // 0x01
+const byte EEPROM_PERIOD_ADDRESS = EEPROM_VERSION_ADDRESS + 1; // 0x02
+const byte EEPROM_VARIANCE_ADDRESS = EEPROM_PERIOD_ADDRESS + 4; // 0x06
+const byte EEPROM_VALID_KEYS_LENGTH_ADDRESS = EEPROM_VARIANCE_ADDRESS + 4; // 0xA0
+const byte EEPROM_VALID_KEYS_ADDRESS = EEPROM_VALID_KEYS_LENGTH_ADDRESS + 1; // 0xA1
 
 #define buttonPin 4
 
-int period = 10; // Delay between keyboard events in seconds
-int variance = 5; // Maximum variance of period in seconds
+unsigned long period = 10; // Delay between keyboard events in seconds
+unsigned long variance = 5; // Maximum variance of period in seconds
 String valid_keys = "wasd ";
 int valid_keys_length = valid_keys.length();
 int nextKeyPress = period;
