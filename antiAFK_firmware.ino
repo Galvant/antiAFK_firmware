@@ -24,10 +24,11 @@
 #include <EEPROM.h>
 #include "EEPROMAnything.h"
 
-//#define DEBUG 1
-#define KEYBOARD_ENABLE 1
+#define DEBUG 1
+//#define KEYBOARD_ENABLE 1
 
 const byte EEPROM_CODE = 0x5C;
+const byte FIRMWARE_VERSION = 1;
 const byte EEPROM_CODE_ADDRESS = 0x00;
 const byte EEPROM_VERSION_ADDRESS = EEPROM_CODE_ADDRESS + 1; // 0x01
 const byte EEPROM_PERIOD_ADDRESS = EEPROM_VERSION_ADDRESS + 1; // 0x02
@@ -65,8 +66,10 @@ void setup() {
   //Check EEPROM for stored settings
   eepromValue = EEPROM.read(EEPROM_CODE_ADDRESS);
   if (eepromValue == EEPROM_CODE) {
-    period = EEPROM.read(EEPROM_PERIOD_ADDRESS);
-    variance = EEPROM.read(EEPROM_VARIANCE_ADDRESS);
+    EEPROM_readAnything(EEPROM_PERIOD_ADDRESS, period);
+    //period = EEPROM.read(EEPROM_PERIOD_ADDRESS);
+    EEPROM_readAnything(EEPROM_VARIANCE_ADDRESS, variance);
+    //variance = EEPROM.read(EEPROM_VARIANCE_ADDRESS);
     valid_keys_length = EEPROM.read(EEPROM_VALID_KEYS_LENGTH_ADDRESS);
     valid_keys = "";
     for (int i = 0; i < valid_keys_length; i++) {
@@ -82,9 +85,11 @@ void setup() {
   }
   else { // EEPROM not valid, so initialize it
     EEPROM.write(EEPROM_CODE_ADDRESS, EEPROM_CODE);
-    EEPROM.write(EEPROM_VERSION_ADDRESS, 1);
-    EEPROM.write(EEPROM_PERIOD_ADDRESS, period);
-    EEPROM.write(EEPROM_VARIANCE_ADDRESS, variance);
+    EEPROM.write(EEPROM_VERSION_ADDRESS, FIRMWARE_VERSION);
+    EEPROM_writeAnything(EEPROM_PERIOD_ADDRESS, period);
+    //EEPROM.write(EEPROM_PERIOD_ADDRESS, period);
+    EEPROM_writeAnything(EEPROM_VARIANCE_ADDRESS, variance);
+    //EEPROM.write(EEPROM_VARIANCE_ADDRESS, variance);
     valid_keys_length = valid_keys.length();
     EEPROM.write(EEPROM_VALID_KEYS_LENGTH_ADDRESS, valid_keys_length);
     for (int i = 0; i < valid_keys_length; i++) {
@@ -162,7 +167,8 @@ void loop() {
     incomingCmd = readLine();
     if (incomingCmd.substring(0,7).equalsIgnoreCase("period:")) {
       period = incomingCmd.substring(7,incomingCmd.length()).toInt();
-      EEPROM.write(EEPROM_PERIOD_ADDRESS, period);
+      EEPROM_readAnything(EEPROM_PERIOD_ADDRESS, period);
+      //EEPROM.write(EEPROM_PERIOD_ADDRESS, period);
       #if defined(DEBUG)
       Serial.print("Period set to: ");
       Serial.println(period);
@@ -174,10 +180,12 @@ void loop() {
         #if defined(DEBUG)
         Serial.println("Variance invalid, loading from EEPROM.");
         #endif
-        variance = EEPROM.read(EEPROM_VARIANCE_ADDRESS);
+        EEPROM_readAnything(EEPROM_VARIANCE_ADDRESS, variance);
+        //variance = EEPROM.read(EEPROM_VARIANCE_ADDRESS);
       }
       else {
-        EEPROM.write(EEPROM_VARIANCE_ADDRESS, variance);
+        EEPROM_writeAnything(EEPROM_VARIANCE_ADDRESS, variance);
+        //EEPROM.write(EEPROM_VARIANCE_ADDRESS, variance);
       }
       #if defined(DEBUG)
       Serial.print("Variance set to: ");
