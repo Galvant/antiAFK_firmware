@@ -54,6 +54,9 @@ keyboard does!
 Installation
 ------------
 
+Required dependencies:
+- Arduino Timer1 library http://playground.arduino.cc/code/timer1
+
 This can be installed on any Arduino Leonardo-compatible board using the official Arduion IDE 
 typical installation methods. 
 
