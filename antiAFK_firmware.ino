@@ -22,6 +22,7 @@
 
 #include "TimerOne.h"
 #include <EEPROM.h>
+#include "EEPROMAnything.h"
 
 //#define DEBUG 1
 #define KEYBOARD_ENABLE 1
