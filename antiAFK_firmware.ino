@@ -43,7 +43,7 @@ String valid_keys = "wasd ";
 int valid_keys_length = valid_keys.length();
 int nextKeyPress = period;
 
-int counter = 0;
+unsigned long counter = 0;
 int prevButtonState = HIGH;
 boolean running = false;
 byte eepromValue = 0;
