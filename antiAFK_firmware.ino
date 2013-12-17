@@ -42,7 +42,7 @@ unsigned long period = 10*1000; // Delay between keyboard events in seconds
 unsigned long variance = 5*1000; // Maximum variance of period in seconds
 String valid_keys = "wasd ";
 int valid_keys_length = valid_keys.length();
-int nextKeyPress = period;
+unsigned long nextKeyPress = period;
 
 unsigned long counter = 0;
 int prevButtonState = HIGH;
