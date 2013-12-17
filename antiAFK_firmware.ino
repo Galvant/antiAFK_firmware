@@ -67,9 +67,7 @@ void setup() {
   eepromValue = EEPROM.read(EEPROM_CODE_ADDRESS);
   if (eepromValue == EEPROM_CODE) {
     EEPROM_readAnything(EEPROM_PERIOD_ADDRESS, period);
-    //period = EEPROM.read(EEPROM_PERIOD_ADDRESS);
     EEPROM_readAnything(EEPROM_VARIANCE_ADDRESS, variance);
-    //variance = EEPROM.read(EEPROM_VARIANCE_ADDRESS);
     valid_keys_length = EEPROM.read(EEPROM_VALID_KEYS_LENGTH_ADDRESS);
     valid_keys = "";
     for (int i = 0; i < valid_keys_length; i++) {
@@ -87,9 +85,7 @@ void setup() {
     EEPROM.write(EEPROM_CODE_ADDRESS, EEPROM_CODE);
     EEPROM.write(EEPROM_VERSION_ADDRESS, FIRMWARE_VERSION);
     EEPROM_writeAnything(EEPROM_PERIOD_ADDRESS, period);
-    //EEPROM.write(EEPROM_PERIOD_ADDRESS, period);
     EEPROM_writeAnything(EEPROM_VARIANCE_ADDRESS, variance);
-    //EEPROM.write(EEPROM_VARIANCE_ADDRESS, variance);
     valid_keys_length = valid_keys.length();
     EEPROM.write(EEPROM_VALID_KEYS_LENGTH_ADDRESS, valid_keys_length);
     for (int i = 0; i < valid_keys_length; i++) {
@@ -170,7 +166,6 @@ void loop() {
     if (incomingCmd.substring(0,7).equalsIgnoreCase("period:")) {
       period = incomingCmd.substring(7,incomingCmd.length()).toInt();
       EEPROM_writeAnything(EEPROM_PERIOD_ADDRESS, period);
-      //EEPROM.write(EEPROM_PERIOD_ADDRESS, period);
       #if defined(DEBUG)
       Serial.print("Period set to: ");
       Serial.println(period);
@@ -183,11 +178,9 @@ void loop() {
         Serial.println("Variance invalid, loading from EEPROM.");
         #endif
         EEPROM_readAnything(EEPROM_VARIANCE_ADDRESS, variance);
-        //variance = EEPROM.read(EEPROM_VARIANCE_ADDRESS);
       }
       else {
         EEPROM_writeAnything(EEPROM_VARIANCE_ADDRESS, variance);
-        //EEPROM.write(EEPROM_VARIANCE_ADDRESS, variance);
       }
       #if defined(DEBUG)
       Serial.print("Variance set to: ");
