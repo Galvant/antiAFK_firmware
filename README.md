@@ -1,7 +1,12 @@
 antiAFK Firmware
 ================
 
-Arduino code for antiAFK project
+Arduino code for antiAFK project by Galvant Industries.
+
+The associated PCB project can be found on GitHub at
+www.github.com/Galvant/antiAFK-PCB
+
+Pre-assembled boards will be available shortly at www.galvant.ca
 
 About
 -----
