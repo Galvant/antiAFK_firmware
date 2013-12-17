@@ -24,8 +24,8 @@
 #include <EEPROM.h>
 #include "EEPROMAnything.h"
 
-#define DEBUG 1
-//#define KEYBOARD_ENABLE 1
+//#define DEBUG 1
+#define KEYBOARD_ENABLE 1
 
 const byte EEPROM_CODE = 0x5A;
 const byte FIRMWARE_VERSION = 1;
