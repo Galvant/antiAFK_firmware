@@ -1,3 +1,11 @@
+/*
+* This code is sourced from the Arduino website 
+* http://playground.arduino.cc/Code/EEPROMWriteAnything
+*
+* Although the license is not explicitly stated on this webpage,
+* I have made the assumption that it is released under the same
+* license as the rest of the Arduino source code.
+*/
 #include <EEPROM.h>
 #include <Arduino.h>  // for type definitions
 
