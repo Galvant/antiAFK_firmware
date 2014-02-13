@@ -24,7 +24,7 @@
 #include <EEPROM.h>
 #include "EEPROMAnything.h"
 
-//#define DEBUG 1
+#define DEBUG 1
 #define KEYBOARD_ENABLE 1
 
 const byte EEPROM_CODE = 0x5A;
@@ -38,8 +38,9 @@ const byte EEPROM_VALID_KEYS_ADDRESS = EEPROM_VALID_KEYS_LENGTH_ADDRESS + 1; // 
 
 #define buttonPin 4
 
-unsigned long period = 10*1000; // Delay between keyboard events in seconds
-unsigned long variance = 5*1000; // Maximum variance of period in seconds
+unsigned long period = 10*1000; // Delay between keyboard events in ms
+unsigned long variance = 5*1000; // Maximum variance of period in ms
+unsigned long duration = 20;
 String valid_keys = "wasd ";
 int valid_keys_length = valid_keys.length();
 unsigned long nextKeyPress = period;
@@ -49,6 +50,7 @@ int prevButtonState = HIGH;
 boolean running = false;
 byte eepromValue = 0;
 String incomingCmd = "";
+char nextKey = 0x00;
 
 void setup() {
   Keyboard.begin();
@@ -108,16 +110,24 @@ void callback() {
     #endif
     if (counter >= nextKeyPress) {
       // Press the key
+      nextKey = valid_keys[random(valid_keys.length())];
       #if defined(DEBUG)
       Serial.print("Key press event after ");
       Serial.print(counter);
       Serial.println(" milliseconds.");
       Serial.print("Key pressed: ");
-      Serial.println(valid_keys[random(valid_keys.length())]);
+      if (nextKey == 32) {
+        Serial.println("{space}");
+      } else {
+        Serial.println(nextKey);
+      }
       #endif
       
       #if defined(KEYBOARD_ENABLE)
-      Keyboard.print(valid_keys[random(valid_keys.length())]);
+      //Keyboard.print(nextKey);
+      Keyboard.press(nextKey);
+      delay(duration);
+      Keyboard.releaseAll();
       #endif
       
       // First, double check that variance is less than period
@@ -132,19 +142,31 @@ void callback() {
 }
 
 void generateNextKeyPress() {
+  /*
+  * This method is used to determine the time until
+  * the next key press event will occur.
+  */
   if (random(0,2) == 0){
     nextKeyPress = period + random(0, variance + 1);
   } else {
     nextKeyPress = period - random(0, variance + 1);
   }
+  duration = 20 + random(0,500);
   #if defined(DEBUG)
   Serial.print("Next key press set to: ");
   Serial.println(nextKeyPress);
+  Serial.print("Duration will be: ");
+  Serial.println(duration);
   #endif
   counter = 0;
 }
 
 void toggleRunningState() {
+  /*
+  * Used to swap between running and standby modes of operation
+  * This is called when the "toggle" string is send from the attached
+  * PC, or the physical button is pushed.
+  */
   running = !running;
   #if defined(DEBUG)
   Serial.print("Running state switched to: ");
@@ -168,8 +190,10 @@ String readLine() {
 }
 
 void loop() {
+  // Get and parse messages from the attached PC
   if (Serial.available() > 0) {
     incomingCmd = readLine();
+    //period:
     if (incomingCmd.substring(0,7).equalsIgnoreCase("period:")) {
       period = incomingCmd.substring(7,incomingCmd.length()).toInt();
       EEPROM_writeAnything(EEPROM_PERIOD_ADDRESS, period);
@@ -179,6 +203,7 @@ void loop() {
       Serial.println(period);
       #endif
     }
+    //variance:
     else if (incomingCmd.substring(0,9).equalsIgnoreCase("variance:")) {
       variance = incomingCmd.substring(9,incomingCmd.length()).toInt();
       if ((variance > period) || (variance < 0)){
@@ -196,9 +221,11 @@ void loop() {
       Serial.println(variance);
       #endif
     }
+    //toggle
     else if (incomingCmd.substring(0,6).equalsIgnoreCase("toggle")) {
       toggleRunningState();
     }
+    //keys:
     else if (incomingCmd.substring(0,5).equalsIgnoreCase("keys:")) {
       if (incomingCmd.length() == 5) {
         #if defined(DEBUG)
