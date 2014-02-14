@@ -24,7 +24,6 @@
 #include <EEPROM.h>
 #include "EEPROMAnything.h"
 
-#define DEBUG 1
 #define KEYBOARD_ENABLE 1
 
 const byte EEPROM_CODE = 0x5A;
@@ -48,6 +47,7 @@ unsigned long nextKeyPress = period;
 unsigned long counter = 0;
 int prevButtonState = HIGH;
 boolean running = false;
+boolean debug = false;
 byte eepromValue = 0;
 String incomingCmd = "";
 char nextKey = 0x00;
@@ -55,9 +55,9 @@ char nextKey = 0x00;
 void setup() {
   Keyboard.begin();
   Serial.begin(9600);
-  #if defined(DEBUG)
-  while(!Serial);
-  #endif
+  if (debug) {
+    while(!Serial);
+  }
   
   pinMode(buttonPin, INPUT);
   randomSeed(analogRead(0));
@@ -75,13 +75,13 @@ void setup() {
     for (int i = 0; i < valid_keys_length; i++) {
       valid_keys += char(EEPROM.read(EEPROM_VALID_KEYS_ADDRESS + i));
     }
-    #if defined(DEBUG)
-    Serial.println("Valid EEPROM code.");
-    Serial.print("Period: ");
-    Serial.println(period);
-    Serial.print("Variance: ");
-    Serial.println(variance);
-    #endif
+    if (debug) {
+      Serial.println("Valid EEPROM code.");
+      Serial.print("Period: ");
+      Serial.println(period);
+      Serial.print("Variance: ");
+      Serial.println(variance);
+    }
   }
   else { // EEPROM not valid, so initialize it
     EEPROM.write(EEPROM_CODE_ADDRESS, EEPROM_CODE);
@@ -93,38 +93,37 @@ void setup() {
     for (int i = 0; i < valid_keys_length; i++) {
       EEPROM.write(EEPROM_VALID_KEYS_ADDRESS + i, valid_keys[i]);
     }
-    #if defined(DEBUG)
-    Serial.println("Not valid EEPROM code.");
-    #endif
+    if (debug) {
+      Serial.println("Not valid EEPROM code.");
+    }
   }
 }
 
 void callback() {
   if (running == true) {
     counter++;
-    #if defined(DEBUG)
-    if (counter % 1000 == 0) {
-      Serial.print("Counter: ");
-      Serial.println(counter);
+    if (debug) {
+      if (counter % 1000 == 0) {
+        Serial.print("Counter: ");
+        Serial.println(counter);
+      }
     }
-    #endif
     if (counter >= nextKeyPress) {
       // Press the key
       nextKey = valid_keys[random(valid_keys.length())];
-      #if defined(DEBUG)
-      Serial.print("Key press event after ");
-      Serial.print(counter);
-      Serial.println(" milliseconds.");
-      Serial.print("Key pressed: ");
-      if (nextKey == 32) {
-        Serial.println("{space}");
-      } else {
-        Serial.println(nextKey);
+      if (debug) {
+        Serial.print("Key press event after ");
+        Serial.print(counter);
+        Serial.println(" milliseconds.");
+        Serial.print("Key pressed: ");
+        if (nextKey == 32) {
+          Serial.println("{space}");
+        } else {
+          Serial.println(nextKey);
+        }
       }
-      #endif
       
       #if defined(KEYBOARD_ENABLE)
-      //Keyboard.print(nextKey);
       Keyboard.press(nextKey);
       delay(duration);
       Keyboard.releaseAll();
@@ -152,12 +151,12 @@ void generateNextKeyPress() {
     nextKeyPress = period - random(0, variance + 1);
   }
   duration = 20 + random(0,500);
-  #if defined(DEBUG)
-  Serial.print("Next key press set to: ");
-  Serial.println(nextKeyPress);
-  Serial.print("Duration will be: ");
-  Serial.println(duration);
-  #endif
+  if (debug) {
+    Serial.print("Next key press set to: ");
+    Serial.println(nextKeyPress);
+    Serial.print("Duration will be: ");
+    Serial.println(duration);
+  }
   counter = 0;
 }
 
@@ -168,10 +167,10 @@ void toggleRunningState() {
   * PC, or the physical button is pushed.
   */
   running = !running;
-  #if defined(DEBUG)
-  Serial.print("Running state switched to: ");
-  Serial.println(running);
-  #endif
+  if (debug) {
+    Serial.print("Running state switched to: ");
+    Serial.println(running);
+  }
   if (running) {
     counter = nextKeyPress; // Gives quick feedback that device is running
   }
@@ -198,28 +197,28 @@ void loop() {
       period = incomingCmd.substring(7,incomingCmd.length()).toInt();
       EEPROM_writeAnything(EEPROM_PERIOD_ADDRESS, period);
       generateNextKeyPress();
-      #if defined(DEBUG)
-      Serial.print("Period set to: ");
-      Serial.println(period);
-      #endif
+      if (debug) {
+        Serial.print("Period set to: ");
+        Serial.println(period);
+      }
     }
     //variance:
     else if (incomingCmd.substring(0,9).equalsIgnoreCase("variance:")) {
       variance = incomingCmd.substring(9,incomingCmd.length()).toInt();
       if ((variance > period) || (variance < 0)){
-        #if defined(DEBUG)
-        Serial.println("Variance invalid, loading from EEPROM.");
-        #endif
+        if (debug) {
+          Serial.println("Variance invalid, loading from EEPROM.");
+        }
         EEPROM_readAnything(EEPROM_VARIANCE_ADDRESS, variance);
       }
       else {
         EEPROM_writeAnything(EEPROM_VARIANCE_ADDRESS, variance);
         generateNextKeyPress();
       }
-      #if defined(DEBUG)
-      Serial.print("Variance set to: ");
-      Serial.println(variance);
-      #endif
+      if (debug) {
+        Serial.print("Variance set to: ");
+        Serial.println(variance);
+      }
     }
     //toggle
     else if (incomingCmd.substring(0,6).equalsIgnoreCase("toggle")) {
@@ -228,9 +227,9 @@ void loop() {
     //keys:
     else if (incomingCmd.substring(0,5).equalsIgnoreCase("keys:")) {
       if (incomingCmd.length() == 5) {
-        #if defined(DEBUG)
-        Serial.println("Must specify at least 1 key.");
-        #endif
+        if (debug) {
+          Serial.println("Must specify at least 1 key.");
+        }
       }
       else {
         valid_keys = incomingCmd.substring(5,incomingCmd.length());
@@ -239,6 +238,13 @@ void loop() {
         for (int i = 0; i < valid_keys_length; i++) {
           EEPROM.write(EEPROM_VALID_KEYS_ADDRESS + i, valid_keys[i]);
         }
+      }
+    }
+    //debug
+    else if (incomingCmd.substring(0,5).equalsIgnoreCase("debug")) {
+      debug = !debug;
+      if (debug) {
+        Serial.println("Debug messages now enabled.");
       }
     }
   }
