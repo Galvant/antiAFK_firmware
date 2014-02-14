@@ -24,8 +24,6 @@
 #include <EEPROM.h>
 #include "EEPROMAnything.h"
 
-#define KEYBOARD_ENABLE 1
-
 const byte EEPROM_CODE = 0x5A;
 const byte FIRMWARE_VERSION = 1;
 const byte EEPROM_CODE_ADDRESS = 0x00;
@@ -48,6 +46,7 @@ unsigned long counter = 0;
 int prevButtonState = HIGH;
 boolean running = false;
 boolean debug = false;
+boolean keyboard_enable = true;
 byte eepromValue = 0;
 String incomingCmd = "";
 char nextKey = 0x00;
@@ -123,11 +122,11 @@ void callback() {
         }
       }
       
-      #if defined(KEYBOARD_ENABLE)
-      Keyboard.press(nextKey);
-      delay(duration);
-      Keyboard.releaseAll();
-      #endif
+      if (keyboard_enable) {
+        Keyboard.press(nextKey);
+        delay(duration);
+        Keyboard.releaseAll();
+      }
       
       // First, double check that variance is less than period
       // if not, load from EEPROM
@@ -245,6 +244,16 @@ void loop() {
       debug = !debug;
       if (debug) {
         Serial.println("Debug messages now enabled.");
+      }
+    }
+    //keyboard
+    else if (incomingCmd.substring(0,8).equalsIgnoreCase("keyboard")) {
+      keyboard_enable = !keyboard_enable;
+      if ((keyboard_enable) && (debug)) {
+        Serial.println("Keyboard output enabled");
+      }
+      else if (debug) {
+        Serial.println("Keyboard output disabled");
       }
     }
   }
