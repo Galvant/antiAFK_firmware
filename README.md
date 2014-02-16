@@ -6,7 +6,7 @@ Arduino code for antiAFK project by Galvant Industries.
 The associated PCB project can be found on GitHub at
 www.github.com/Galvant/antiAFK-PCB
 
-Pre-assembled boards will be available shortly at www.galvant.ca
+Pre-assembled boards can be found at http://galvant.ca/shop/antiafk/
 
 About
 -----
@@ -51,19 +51,6 @@ memory to check for unauthorized software running. The antiAFK presents itself
 to the PC as a completely legitimate HID keyboard, the same as your real USB 
 keyboard does!
 
-Installation
-------------
-
-Required dependencies:
-- Arduino Timer1 library http://playground.arduino.cc/code/timer1
-
-This can be installed on any Arduino Leonardo-compatible board using the official Arduion IDE 
-typical installation methods. 
-
-When building your own, the push button is connected to digital pin 4 with a 
-pull-up resistor. You can change this as you see fit by modifying the source
-code.
-
 Usage
 -----
 
@@ -84,6 +71,23 @@ reporting you being away during player vs player matches!
 Once you return, simply press the button again to deactivate the key presses.
 Or, one could just remove the antiAFK from their PC USB port.
 
+Compilation
+-----------
+To compile and upload this project, the following is required. Note that
+pre-assembled boards already have the code loaded and thus this section
+can be ignored if you have no intention of compiling the source code.
+
+Required dependencies:
+- Arduino Timer1 library http://playground.arduino.cc/code/timer1
+- Entropy library https://code.google.com/p/avr-hardware-random-number-generation/wiki/WikiAVRentropy
+
+This can be installed on any Arduino Leonardo-compatible board using the official Arduion IDE 
+typical installation methods. 
+
+When building your own, the push button is connected to digital pin 4 with a 
+pull-up resistor. You can change this as you see fit by modifying the source
+code.
+
 Settings
 --------
 
@@ -91,36 +95,24 @@ Period, variance, and the key set can all be changed by the user via the virtual
 The easiest way for most will be to use the serial monitor built into the Arduino IDE. Most
 users will find that the defaults are sufficient for most's needs.
 
-period:10000
+`period:10000` This will set the period to 10,000ms = 10sec. Period is stored in an unsigned 
+long and thus the max value is 2^(32)-1.
 
-This will set the period to 10,000ms = 10sec. Period is stored in an unsigned long and thus
-the max value is 2^(32)-1.
+`variance:5000` This sets the variance to 5,000ms = 5sec. Variance is stored in an unsigned 
+long and thus the max value is 2^(32)-1.
 
-variance:5000
+`keys:w asd` This would set the valid keys to wasd and space. Note that for this example
+the space was located between the 'w' and 'a', but that is not required. It was simply 
+done to help show that there is a space.
 
-This sets the variance to 5,000ms = 5sec. Variance is stored in an unsigned long and thus the
-max value is 2^(32)-1.
-
-keys:w asd
-
-This would set the valid keys to wasd and space. Note that for this example
-the space was located between the 'w' and 'a', but that is not required. It 
-was simply done to help show that there is a space.
-
-toggle
-
-This can be used to toggle the running state of the antiAFK board without 
+`toggle` This can be used to toggle the running state of the antiAFK board without 
 having to activate the physical push-button.
 
-debug
-
-This command will toggle on/off the sending of debug messages back to the PC over the 
+`debug` This command will toggle on/off the sending of debug messages back to the PC over the 
 virtual serial port. The default is off. This setting is not saved through power cycles.
 
-keyboard
-
-This command will toggle on/off the actual keyboard key presses to the PC. The default
-is on. This setting is not saved through power cycles.
+`keyboard` This command will toggle on/off the actual keyboard key presses to the PC.
+The default is on. This setting is not saved through power cycles.
 
 License
 -------
