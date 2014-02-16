@@ -1,6 +1,6 @@
 /* antiAFK_firmware.ino: 
 **
-* © 2013 Steven Casagrande (scasagrande@galvant.ca).
+* © 2013-2014 Steven Casagrande (scasagrande@galvant.ca).
 *
 * This file is a part of the InstrumentKit project.
 * Licensed under the AGPL version 3.
@@ -23,6 +23,7 @@
 #include "TimerOne.h"
 #include <EEPROM.h>
 #include "EEPROMAnything.h"
+#include <Entropy.h>
 
 const byte EEPROM_CODE = 0x5A;
 const byte FIRMWARE_VERSION = 1;
@@ -57,9 +58,9 @@ void setup() {
   if (debug) {
     while(!Serial);
   }
+  Entropy.Initialize();
   
   pinMode(buttonPin, INPUT);
-  randomSeed(analogRead(0));
   
   Timer1.initialize(1000); // Starts timer with 1000us interupt
   Timer1.attachInterrupt(callback);
@@ -144,12 +145,12 @@ void generateNextKeyPress() {
   * This method is used to determine the time until
   * the next key press event will occur.
   */
-  if (random(0,2) == 0){
-    nextKeyPress = period + random(0, variance + 1);
+  if (Entropy.random(0,2) == 0){
+    nextKeyPress = period + Entropy.random(0, variance + 1);
   } else {
-    nextKeyPress = period - random(0, variance + 1);
+    nextKeyPress = period - Entropy.random(0, variance + 1);
   }
-  duration = 20 + random(0,500);
+  duration = 20 + Entropy.random(0,512);
   if (debug) {
     Serial.print("Next key press set to: ");
     Serial.println(nextKeyPress);
