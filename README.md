@@ -88,7 +88,8 @@ Settings
 --------
 
 Period, variance, and the key set can all be changed by the user via the virtual serial port.
-The easiest way for most will be to use the serial monitor built into the Arduino IDE.
+The easiest way for most will be to use the serial monitor built into the Arduino IDE. Most
+users will find that the defaults are sufficient for most's needs.
 
 period:10000
 
@@ -110,6 +111,16 @@ toggle
 
 This can be used to toggle the running state of the antiAFK board without 
 having to activate the physical push-button.
+
+debug
+
+This command will toggle on/off the sending of debug messages back to the PC over the 
+virtual serial port. The default is off. This setting is not saved through power cycles.
+
+keyboard
+
+This command will toggle on/off the actual keyboard key presses to the PC. The default
+is on. This setting is not saved through power cycles.
 
 License
 -------
